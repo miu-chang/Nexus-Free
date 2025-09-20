@@ -70,7 +70,7 @@ The UI Edition includes **12 essential tools**. Upgrade to **Nexus Pro** for:
 
 - 📖 [Documentation](https://github.com/miu-chang/Nexus-Free/wiki)
 - 🐛 [Report Issues](https://github.com/miu-chang/Nexus-Free/issues)
-- 💬 [Discord Community](https://discord.gg/nexusai)
+- 💬 [Discord Community](https://discord.gg/MXwHCVWmPe)
 
 ## 📄 License
 
