@@ -1,0 +1,23 @@
+{
+  "name": "NexusAI.MCP.Unity.Editor",
+  "rootNamespace": "NexusAIConnect",
+  "references": [
+    "NexusAI.MCP.Unity",
+    "Unity.Mathematics",
+    "Unity.Collections",
+    "Unity.Burst",
+    "Unity.TextMeshPro",
+    "Unity.Nuget.Newtonsoft-Json"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

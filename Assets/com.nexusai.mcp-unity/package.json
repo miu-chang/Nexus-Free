@@ -1,0 +1,37 @@
+{
+  "name": "com.nexusai.mcp-unity-ui",
+  "version": "1.0.0",
+  "displayName": "NexusAI MCP Unity Integration - UI Edition (Free)",
+  "description": "Free UI-focused Unity integration for NexusAI MCP (Model Context Protocol). Create stunning Unity UI with natural language commands. Perfect for rapid UI prototyping and development. Upgrade to Pro for 148+ advanced tools.",
+  "unity": "2022.3",
+  "keywords": [
+    "ai",
+    "mcp",
+    "nexus",
+    "ui",
+    "natural-language",
+    "automation",
+    "chatgpt",
+    "claude",
+    "free",
+    "ui-design",
+    "rapid-prototyping"
+  ],
+  "author": {
+    "name": "NexusAI Development Team",
+    "email": "support@nexusai.dev",
+    "url": "https://nexusai.dev"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "samples": [
+    {
+      "displayName": "UI Creation Demo",
+      "description": "Demonstration of AI-powered UI creation with natural language",
+      "path": "Samples~/UIDemo"
+    }
+  ]
+}
