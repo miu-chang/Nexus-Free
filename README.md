@@ -27,6 +27,31 @@ Transform your Unity UI development workflow with AI-powered automation. The UI 
 4. **Connect** your AI app (Claude Desktop or ChatGPT)
 5. **Start creating** UI with natural language!
 
+ ## 📦 Installation from GitHub
+
+  ### Method 1: Direct Download (Recommended)
+  1. Download the repository as ZIP
+  2. Extract to a temporary folder
+  3. Copy `Assets/com.nexusai.mcp-unity` folder to your Unity project's `Assets` folder
+  4. Unity will prompt to install Newtonsoft.Json - click "Install"
+
+  ### Method 2: Git Clone
+  1. Clone to temporary location:
+     ```bash
+     git clone https://github.com/miu-chang/Nexus-Free.git temp-nexus
+  2. Copy only the package folder:
+  cp -r temp-nexus/Assets/com.nexusai.mcp-unity your-project/Assets/
+  3. Open Unity and install dependencies when prompted
+
+  ⚠️ Important: Dependencies
+
+  After importing, you may need to manually install:
+  - Window > Package Manager > + > Add package by name
+  - Enter: com.unity.nuget.newtonsoft-json (version 3.2.1)
+
+
+
+
 ## 💬 Usage Examples
 
 Talk to your AI assistant with commands like:
