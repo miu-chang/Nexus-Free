@@ -621,6 +621,10 @@ async function initializeMCPServer() {
         });
         
         console.log('MCP Server initialized with UI Edition tools (23 tools)');
+        
+        // MCPサーバーを起動（stdio経由でClaudeと通信）
+        await mcpServer.start();
+        console.log('MCP Server started successfully');
     } catch (error) {
         console.error('Failed to initialize MCP server:', error);
         throw error;

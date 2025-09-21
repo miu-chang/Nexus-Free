@@ -580,7 +580,7 @@ namespace NexusAIConnect
                     }
                 }
                 
-                // MCPサーバー起動
+                // MCPサーバー接続確認（実際にはサーバーは起動せず、既存のサーバーをチェックするだけ）
                 mcpServerRunning = await mcpSetupManager.StartMCPServer();
                 
                 // アニメーション停止
