@@ -6,6 +6,7 @@ class BridgeHandler {
         this.desktopSocket = null;
         this.conversationHistory = [];
         this.pendingToolExecutions = new Map();
+        this.pendingRequests = new Map();
     }
 
     // Unity接続を設定
@@ -125,6 +126,35 @@ class BridgeHandler {
             historyLength: this.conversationHistory.length,
             pendingTools: this.pendingToolExecutions.size
         };
+    }
+
+    savePendingRequest(requestId, handlers) {
+        this.pendingRequests.set(requestId, handlers);
+    }
+
+    clearPendingRequest(requestId) {
+        const pending = this.pendingRequests.get(requestId);
+        if (pending && pending.timeoutId) {
+            clearTimeout(pending.timeoutId);
+        }
+        this.pendingRequests.delete(requestId);
+    }
+
+    handleMCPResponse(response) {
+        if (!response.requestId) return;
+        
+        const pending = this.pendingRequests.get(response.requestId);
+        if (pending) {
+            clearTimeout(pending.timeoutId);
+            
+            if (response.error) {
+                pending.reject(new Error(response.error));
+            } else {
+                pending.resolve(response.result || response.data);
+            }
+            
+            this.pendingRequests.delete(response.requestId);
+        }
     }
 }
 

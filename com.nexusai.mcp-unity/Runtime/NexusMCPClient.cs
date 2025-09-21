@@ -103,6 +103,26 @@ namespace NexusAIConnect
             }
         }
 
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus)
+            {
+                Debug.Log("[Nexus MCP] Application paused, disconnecting WebSocket");
+                DisconnectFromMCPServer();
+            }
+            else
+            {
+                Debug.Log("[Nexus MCP] Application resumed, reconnecting WebSocket");
+                _ = Task.Run(async () => await ConnectToMCPServer());
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            Debug.Log("[Nexus MCP] Application quitting, cleaning up WebSocket connection");
+            DisconnectFromMCPServer();
+        }
+
 #if UNITY_EDITOR
         private void OnPlayModeStateChanged(PlayModeStateChange state)
         {
@@ -738,7 +758,14 @@ namespace NexusAIConnect
                 if (webSocket != null && isConnected)
                 {
                     isConnected = false;
-                    webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Disconnecting", CancellationToken.None);
+                    
+                    // 同期的にクローズを完了させる
+                    if (webSocket.State == WebSocketState.Open || webSocket.State == WebSocketState.CloseReceived)
+                    {
+                        var closeTask = webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Unity disconnecting", CancellationToken.None);
+                        closeTask.Wait(TimeSpan.FromSeconds(5)); // 最大5秒待機
+                    }
+                    
                     webSocket.Dispose();
                     webSocket = null;
                     

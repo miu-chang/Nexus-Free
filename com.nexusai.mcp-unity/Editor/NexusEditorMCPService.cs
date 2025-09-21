@@ -53,6 +53,8 @@ namespace NexusAIConnect
         {
             public string type;
             public string id;
+            public string requestId;
+            public string operation;
             public string provider;
             public string content;
             public Dictionary<string, object> parameters;
@@ -531,12 +533,12 @@ namespace NexusAIConnect
 
         private static void ExecuteUnityOperation(MCPMessage message)
         {
-            Debug.Log($"[Nexus Editor MCP] Executing Unity operation: {message.tool} with command: {message.command}");
+            Debug.Log($"[Nexus Editor MCP] Executing Unity operation: {message.operation ?? message.tool} with command: {message.command}");
             
             try
             {
                 // MCPツール名をUnity操作にマッピング
-                string operationType = message.command ?? message.tool ?? "";
+                string operationType = message.operation ?? message.command ?? message.tool ?? "";
                 
                 // ツール名を既存のオペレーションタイプに変換
                 operationType = ConvertMCPToolToOperation(operationType);
@@ -592,12 +594,12 @@ namespace NexusAIConnect
                 }
                 
                 // Unity操作を実行（メインスレッド上で同期実行）
-                ExecuteOperationAsync(operation, message.id);
+                ExecuteOperationAsync(operation, message.requestId ?? message.id);
             }
             catch (Exception e)
             {
                 Debug.LogError($"[Nexus Editor MCP] Unity operation error: {e.Message}");
-                _ = SendOperationResult(message.id, false, $"Error: {e.Message}");
+                _ = SendOperationResult(message.requestId ?? message.id, false, $"Error: {e.Message}");
             }
         }
 
@@ -688,8 +690,13 @@ namespace NexusAIConnect
             {
                 type = "operation_result",
                 id = messageId,
+                requestId = messageId, // 互換性のため両方設定
                 content = result, // 元の結果（JSON文字列）をそのまま返す
-                data = new { success = success }
+                data = new { 
+                    success = success,
+                    result = structuredData ?? result,
+                    error = success ? null : result
+                }
             };
 
             try

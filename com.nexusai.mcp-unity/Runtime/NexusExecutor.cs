@@ -1225,7 +1225,7 @@ namespace NexusAIConnect
         
         private string CreateUI(Dictionary<string, string> parameters)
         {
-            var uiType = parameters.GetValueOrDefault("type", "button");
+            var uiType = parameters.GetValueOrDefault("uiType", parameters.GetValueOrDefault("type", "button"));
             var name = parameters.GetValueOrDefault("name", uiType);
             
             // Ensure Canvas exists
@@ -15603,7 +15603,7 @@ public class {treeName} : MonoBehaviour
         {
             try
             {
-                var gridName = parameters.GetValueOrDefault("gridName", "UIGrid");
+                var gridName = parameters.GetValueOrDefault("name", parameters.GetValueOrDefault("gridName", "UIGrid"));
                 var columns = int.Parse(parameters.GetValueOrDefault("columns", "3"));
                 var rows = int.Parse(parameters.GetValueOrDefault("rows", "3"));
                 var cellSize = ParseVector2(parameters.GetValueOrDefault("cellSize", "100,100"));
@@ -15958,7 +15958,7 @@ public class {treeName} : MonoBehaviour
         {
             try
             {
-                var notificationName = parameters.GetValueOrDefault("notificationName", "NotificationSystem");
+                var notificationName = parameters.GetValueOrDefault("name", parameters.GetValueOrDefault("notificationName", "NotificationSystem"));
                 var notificationType = parameters.GetValueOrDefault("notificationType", "toast");
                 var position = parameters.GetValueOrDefault("position", "top-right");
                 var animationType = parameters.GetValueOrDefault("animationType", "slide");
@@ -16297,7 +16297,7 @@ public class {treeName} : MonoBehaviour
         {
             try
             {
-                var dialogName = parameters.GetValueOrDefault("dialogName", "Dialog");
+                var dialogName = parameters.GetValueOrDefault("name", parameters.GetValueOrDefault("dialogName", "Dialog"));
                 var dialogType = parameters.GetValueOrDefault("dialogType", "confirmation");
                 var title = parameters.GetValueOrDefault("title", "Dialog Title");
                 var message = parameters.GetValueOrDefault("message", "Dialog message content");

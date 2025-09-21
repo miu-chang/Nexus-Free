@@ -72,16 +72,23 @@ Talk to your AI assistant with commands like:
 
 ## 🆙 Want More Power?
 
-The UI Edition includes **12 essential tools**. Upgrade to **Nexus Pro** for:
+The UI Edition includes **23 essential tools**. Upgrade to **Nexus Pro** for:
 
-### 🎮 Complete Game Development Suite (148+ Tools)
+### 🎮 Complete Game Development Suite (147+ Tools)
 - **Advanced Animation** - Timeline, blend trees, state machines
 - **AI & GOAP Systems** - Intelligent agent behaviors
 - **Audio Revolution** - Advanced audio mixing and spatial sound
 - **Performance Optimization** - Batch processing, asset optimization
 - **Script Generation** - AI-powered C# code creation
 - **Project Planning** - Intelligent task decomposition
-- **And 130+ more advanced tools!**
+- **And 120+ more advanced tools!**
+
+### ✅ Pro Version Benefits
+- **Regular bug fixes and updates** - Stress-free, stable experience
+- **Priority support** - Get help when you need it
+- **Performance optimizations** - Faster and more reliable
+- **Commercial license** - Use in professional projects
+- **Early access to new features** - Stay ahead of the curve
 
 [**🔥 Upgrade to Nexus Pro →**](https://assetstore.unity.com/packages/tools/nexus-pro)
 

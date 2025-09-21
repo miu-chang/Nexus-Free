@@ -30,13 +30,15 @@ let shutdownTimer = null;
 let connectionCount = 0;
 
 function checkAndScheduleShutdown() {
-    // 接続がすべて切れた場合、30秒後に自動終了
+    // 接続がすべて切れた場合、10秒後に自動終了
     if (connectionCount === 0) {
-        console.log('All connections closed. Scheduling shutdown in 30 seconds...');
+        // console.logはstdio通信を壊すので使わない
         shutdownTimer = setTimeout(() => {
-            console.log('No active connections for 30 seconds. Shutting down MCP server...');
+            // console.logはstdio通信を壊すので使わない
+            if (wss) wss.close();
+            if (server) server.close();
             process.exit(0);
-        }, 30000); // 30秒
+        }, 10000); // 10秒
     } else if (shutdownTimer) {
         // 新しい接続があったらタイマーをキャンセル
         clearTimeout(shutdownTimer);
@@ -46,7 +48,7 @@ function checkAndScheduleShutdown() {
 
 function updateConnectionCount(delta) {
     connectionCount += delta;
-    console.log(`Active connections: ${connectionCount}`);
+    // console.logはstdio通信を壊すので使わない
     checkAndScheduleShutdown();
 }
 
@@ -83,7 +85,7 @@ function setupWebSocketHandlers() {
                         }));
                     }
                 } catch (error) {
-                    console.error('Desktop app message error:', error);
+                    // console.error('Desktop app message error:', error);
                 }
             });
             
@@ -108,12 +110,20 @@ function setupWebSocketHandlers() {
                 try {
                     const data = JSON.parse(message);
                     
-                    if (data.type === 'tool_response') {
+                    if (data.type === 'operation_result' || data.type === 'operation_response') {
                         // MCPサーバーからのレスポンスを処理
-                        bridgeHandler.handleMCPResponse(data.result);
+                        // Unity側はoperation_responseを送るので両方対応
+                        const responseData = {
+                            requestId: data.operationId || data.requestId || data.id,
+                            result: data.result,
+                            error: data.error,
+                            success: data.success,
+                            data: data.data
+                        };
+                        bridgeHandler.handleMCPResponse(responseData);
                     }
                 } catch (error) {
-                    console.error('Unity WebSocket message error:', error);
+                    // console.error('Unity WebSocket message error:', error);
                 }
             });
             
@@ -138,7 +148,7 @@ async function initializeMCPServer() {
             }
             
             return new Promise((resolve, reject) => {
-                const requestId = Date.now().toString();
+                const requestId = Math.random().toString(36).substr(2, 9);
                 
                 const timeoutId = setTimeout(() => {
                     bridgeHandler.clearPendingRequest(requestId);
@@ -150,7 +160,7 @@ async function initializeMCPServer() {
                 
                 // Unityに送信
                 unityWebSocket.send(JSON.stringify({
-                    type: 'tool_request',
+                    type: 'tool_call',
                     requestId,
                     operation,
                     parameters
@@ -182,7 +192,7 @@ async function initializeMCPServer() {
                 anchorPreset: z.enum(['top-left', 'top-center', 'top-right', 'middle-left', 'middle-center', 'middle-right', 'bottom-left', 'bottom-center', 'bottom-right', 'stretch-stretch']).optional()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('CREATE_UI', params);
+            const result = await sendUnityCommand('create_ui', params);
             return {
                 content: [{
                     type: 'text',
@@ -374,7 +384,7 @@ async function initializeMCPServer() {
                 parent: z.string().optional()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('CREATE_GAMEOBJECT', params);
+            const result = await sendUnityCommand('create_gameobject', params);
             return {
                 content: [{
                     type: 'text',
@@ -394,7 +404,7 @@ async function initializeMCPServer() {
                 tag: z.string().optional()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('UPDATE_GAMEOBJECT', params);
+            const result = await sendUnityCommand('update_gameobject', params);
             return {
                 content: [{
                     type: 'text',
@@ -410,7 +420,7 @@ async function initializeMCPServer() {
                 name: z.string()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('DELETE_GAMEOBJECT', params);
+            const result = await sendUnityCommand('delete_gameobject', params);
             return {
                 content: [{
                     type: 'text',
@@ -442,7 +452,7 @@ async function initializeMCPServer() {
                 space: z.enum(['world', 'local']).default('world')
             })
         }, async (params) => {
-            const result = await sendUnityCommand('SET_TRANSFORM', params);
+            const result = await sendUnityCommand('set_transform', params);
             return {
                 content: [{
                     type: 'text',
@@ -459,7 +469,7 @@ async function initializeMCPServer() {
                 componentType: z.string()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('ADD_COMPONENT', params);
+            const result = await sendUnityCommand('add_component', params);
             return {
                 content: [{
                     type: 'text',
@@ -477,7 +487,7 @@ async function initializeMCPServer() {
                 properties: z.record(z.any())
             })
         }, async (params) => {
-            const result = await sendUnityCommand('UPDATE_COMPONENT', params);
+            const result = await sendUnityCommand('update_component', params);
             return {
                 content: [{
                     type: 'text',
@@ -496,7 +506,7 @@ async function initializeMCPServer() {
                 value: z.any()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('SET_PROPERTY', params);
+            const result = await sendUnityCommand('set_property', params);
             return {
                 content: [{
                     type: 'text',
@@ -514,7 +524,7 @@ async function initializeMCPServer() {
                 includeChildren: z.boolean().default(false)
             })
         }, async (params) => {
-            const result = await sendUnityCommand('GET_GAMEOBJECT_DETAILS', params);
+            const result = await sendUnityCommand('get_gameobject_details', params);
             return {
                 content: [{
                     type: 'text',
@@ -532,7 +542,7 @@ async function initializeMCPServer() {
                 includeStats: z.boolean().default(true)
             })
         }, async (params) => {
-            const result = await sendUnityCommand('GET_SCENE_INFO', params);
+            const result = await sendUnityCommand('get_scene_info', params);
             return {
                 content: [{
                     type: 'text',
@@ -551,7 +561,7 @@ async function initializeMCPServer() {
                 description: z.string().optional()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('CREATE_CHECKPOINT', params);
+            const result = await sendUnityCommand('create_checkpoint', params);
             return {
                 content: [{
                     type: 'text',
@@ -567,7 +577,7 @@ async function initializeMCPServer() {
                 name: z.string()
             })
         }, async (params) => {
-            const result = await sendUnityCommand('RESTORE_CHECKPOINT', params);
+            const result = await sendUnityCommand('restore_checkpoint', params);
             return {
                 content: [{
                     type: 'text',
@@ -583,7 +593,7 @@ async function initializeMCPServer() {
                 limit: z.number().default(10)
             })
         }, async (params) => {
-            const result = await sendUnityCommand('GET_HISTORY', params);
+            const result = await sendUnityCommand('get_history', params);
             return {
                 content: [{
                     type: 'text',
@@ -597,7 +607,7 @@ async function initializeMCPServer() {
             description: 'Undo the last operation',
             inputSchema: z.object({})
         }, async (params) => {
-            const result = await sendUnityCommand('UNDO', params);
+            const result = await sendUnityCommand('undo', params);
             return {
                 content: [{
                     type: 'text',
@@ -611,7 +621,7 @@ async function initializeMCPServer() {
             description: 'Redo the last undone operation',
             inputSchema: z.object({})
         }, async (params) => {
-            const result = await sendUnityCommand('REDO', params);
+            const result = await sendUnityCommand('redo', params);
             return {
                 content: [{
                     type: 'text',
@@ -620,13 +630,12 @@ async function initializeMCPServer() {
             };
         });
         
-        console.log('MCP Server initialized with UI Edition tools (23 tools)');
+        // console.logはstdio通信を壊すので使わない
         
         // MCPサーバーを起動（stdio経由でClaudeと通信）
         await mcpServer.start();
-        console.log('MCP Server started successfully');
     } catch (error) {
-        console.error('Failed to initialize MCP server:', error);
+        // console.error('Failed to initialize MCP server:', error);
         throw error;
     }
 }
@@ -638,16 +647,12 @@ server.listen(PORT, async () => {
     // WebSocketサーバーの作成と設定
     wss = new WebSocket.Server({ server });
     setupWebSocketHandlers();
-    console.log(`Nexus MCP Unity Integration - UI Edition`);
-    console.log(`Server running on port ${PORT}`);
-    console.log(`This version includes 23 essential UI and GameObject tools`);
-    console.log(`For 147+ professional tools, upgrade to Nexus Pro`);
+    // console.logはstdio通信を壊すので使わない
     
     try {
         await initializeMCPServer();
-        console.log('MCP Server initialized successfully');
     } catch (error) {
-        console.error('Failed to initialize MCP server:', error);
+        // エラーもstderr経由で出力しない（JSON-RPC通信を妨害するため）
         process.exit(1);
     }
 });
@@ -655,16 +660,16 @@ server.listen(PORT, async () => {
 
 // エラーハンドリング
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
+    // console.error('Uncaught Exception:', error);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 // グレースフルシャットダウン
 process.on('SIGTERM', () => {
-    console.log('Received SIGTERM, shutting down gracefully...');
+    // console.log('Received SIGTERM, shutting down gracefully...');
     if (wss) {
         wss.close(() => {
             process.exit(0);
@@ -675,7 +680,7 @@ process.on('SIGTERM', () => {
 });
 
 process.on('SIGINT', () => {
-    console.log('Received SIGINT, shutting down gracefully...');
+    // console.log('Received SIGINT, shutting down gracefully...');
     if (wss) {
         wss.close(() => {
             process.exit(0);
@@ -683,4 +688,25 @@ process.on('SIGINT', () => {
     } else {
         process.exit(0);
     }
+});
+
+// Claudeが終了する際にポートを確実に解放
+process.on('beforeExit', (code) => {
+    if (wss) {
+        wss.close();
+    }
+    if (server) {
+        server.close();
+    }
+});
+
+// stdioが閉じられた時の処理
+process.stdin.on('end', () => {
+    if (wss) {
+        wss.close();
+    }
+    if (server) {
+        server.close();
+    }
+    process.exit(0);
 });
