@@ -702,6 +702,36 @@ namespace NexusAIConnect
             }
         }
         
+        private string GetMCPServerPath()
+        {
+            // まずNexus-Free版のパスを確認
+            string nexusFreePath = Path.Combine(Application.dataPath, "Nexus-Free", "com.nexusai.mcp-unity", "MCPServer", "index.js");
+            if (File.Exists(nexusFreePath))
+            {
+                Debug.Log($"[Nexus] Found MCP Server in Nexus-Free: {nexusFreePath}");
+                return nexusFreePath;
+            }
+            
+            // 次に通常版のパスを確認
+            string standardPath = Path.Combine(Application.dataPath, "com.nexusai.mcp-unity", "MCPServer", "index.js");
+            if (File.Exists(standardPath))
+            {
+                Debug.Log($"[Nexus] Found MCP Server in standard location: {standardPath}");
+                return standardPath;
+            }
+            
+            // 最後にプロジェクトルートのMCPServerを確認
+            string projectRootPath = Path.Combine(Application.dataPath.Replace("/Assets", ""), "MCPServer", "index.js");
+            if (File.Exists(projectRootPath))
+            {
+                Debug.Log($"[Nexus] Found MCP Server in project root: {projectRootPath}");
+                return projectRootPath;
+            }
+            
+            Debug.LogError("[Nexus] MCP Server not found in any expected location!");
+            return projectRootPath; // デフォルトとして返す
+        }
+
         private List<string> DetectInstalledAIs()
         {
             var installedAIs = new List<string>();
@@ -766,11 +796,12 @@ namespace NexusAIConnect
                 }
             }
             
-            // Unity MCPサーバー設定
+            // Unity MCPサーバー設定 - Nexus-Free版のパスを検出
+            string mcpServerPath = GetMCPServerPath();
             var unityMcpServer = new
             {
                 command = "node",
-                args = new[] { Path.Combine(Application.dataPath.Replace("/Assets", ""), "MCPServer", "index.js") },
+                args = new[] { mcpServerPath },
                 env = new { }
             };
             
@@ -944,11 +975,12 @@ namespace NexusAIConnect
                 }
             }
             
-            // Unity MCPサーバー設定
+            // Unity MCPサーバー設定 - Nexus-Free版のパスを検出
+            string mcpServerPath = GetMCPServerPath();
             var unityMcpServer = new
             {
                 command = "node",
-                args = new[] { Path.Combine(Application.dataPath.Replace("/Assets", ""), "MCPServer", "index.js") },
+                args = new[] { mcpServerPath },
                 env = new { }
             };
             
