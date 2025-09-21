@@ -628,17 +628,14 @@ async function initializeMCPServer() {
 }
 
 // サーバー起動
-const PORT = process.env.PORT || 3000;
-const WS_PORT = process.env.WS_PORT || 3001;
-
-// WebSocketサーバーの作成と設定
-wss = new WebSocket.Server({ port: WS_PORT });
-setupWebSocketHandlers();
+const PORT = process.env.PORT || 8080;
 
 server.listen(PORT, async () => {
+    // WebSocketサーバーの作成と設定
+    wss = new WebSocket.Server({ server });
+    setupWebSocketHandlers();
     console.log(`Nexus MCP Unity Integration - UI Edition`);
-    console.log(`HTTP Server running on port ${PORT}`);
-    console.log(`WebSocket Server running on port ${WS_PORT}`);
+    console.log(`Server running on port ${PORT}`);
     console.log(`This version includes 23 essential UI and GameObject tools`);
     console.log(`For 147+ professional tools, upgrade to Nexus Pro`);
     
