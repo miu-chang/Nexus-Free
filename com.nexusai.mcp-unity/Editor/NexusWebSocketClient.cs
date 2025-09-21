@@ -272,32 +272,20 @@ namespace NexusAIConnect
                 switch (operation.type)
                 {
                     case "GET_SCENE_INFO":
-                        result = NexusStateInspector.GetSceneInformation();
-                        break;
                     case "GET_CAMERA_INFO":
-                        result = NexusStateInspector.GetCameraInformation();
-                        break;
+                    // State Inspector features disabled in UI Edition
                     case "GET_TERRAIN_INFO":
-                        result = NexusStateInspector.GetTerrainInformation();
-                        break;
                     case "GET_LIGHTING_INFO":
-                        result = NexusStateInspector.GetLightingInformation();
-                        break;
                     case "GET_MATERIAL_INFO":
-                        result = NexusStateInspector.GetMaterialInformation();
-                        break;
                     case "GET_UI_INFO":
-                        result = NexusStateInspector.GetUIInformation();
-                        break;
                     case "GET_PHYSICS_INFO":
-                        result = NexusStateInspector.GetPhysicsInformation();
-                        break;
                     case "GET_GAMEOBJECT_DETAILS":
-                        var name = operation.parameters.GetValueOrDefault("name", "");
-                        result = NexusStateInspector.GetGameObjectDetails(name);
-                        break;
                     case "GET_PROJECT_STATS":
-                        result = NexusStateInspector.GetProjectStatistics();
+                        result = JsonConvert.SerializeObject(new
+                        {
+                            success = false,
+                            message = "State inspection features are not available in UI Edition"
+                        });
                         break;
                     default:
                         // 通常の操作
