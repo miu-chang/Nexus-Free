@@ -25,11 +25,38 @@ let desktopAppSocket = null; // デスクトップアプリ接続用
 const BridgeHandler = require('./bridge-handler');
 const bridgeHandler = new BridgeHandler();
 
+// 自動シャットダウン機能
+let shutdownTimer = null;
+let connectionCount = 0;
+
+function checkAndScheduleShutdown() {
+    // 接続がすべて切れた場合、30秒後に自動終了
+    if (connectionCount === 0) {
+        console.log('All connections closed. Scheduling shutdown in 30 seconds...');
+        shutdownTimer = setTimeout(() => {
+            console.log('No active connections for 30 seconds. Shutting down MCP server...');
+            process.exit(0);
+        }, 30000); // 30秒
+    } else if (shutdownTimer) {
+        // 新しい接続があったらタイマーをキャンセル
+        clearTimeout(shutdownTimer);
+        shutdownTimer = null;
+    }
+}
+
+function updateConnectionCount(delta) {
+    connectionCount += delta;
+    console.log(`Active connections: ${connectionCount}`);
+    checkAndScheduleShutdown();
+}
+
 // Unity WebSocket接続の管理（関数として定義）
 function setupWebSocketHandlers() {
     if (!wss) return;
     
     wss.on('connection', (ws, req) => {
+        updateConnectionCount(1); // 接続時にカウント増加
+        
         // 接続タイプを判定
         const isUnity = req.headers['x-client-type'] === 'unity' || req.url === '/unity';
         const isMCP = req.headers['x-client-type'] === 'mcp' || req.url === '/mcp';
@@ -65,6 +92,7 @@ function setupWebSocketHandlers() {
                     desktopAppSocket = null;
                     bridgeHandler.clearDesktopConnection();
                 }
+                updateConnectionCount(-1); // 切断時にカウント減少
             });
         } else {
             // Unity接続
@@ -94,6 +122,7 @@ function setupWebSocketHandlers() {
                     unityWebSocket = null;
                     bridgeHandler.clearUnityConnection();
                 }
+                updateConnectionCount(-1); // 切断時にカウント減少
             });
         }
     });
@@ -622,6 +651,7 @@ server.listen(PORT, async () => {
     }
 });
 
+
 // エラーハンドリング
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
@@ -629,4 +659,27 @@ process.on('uncaughtException', (error) => {
 
 process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// グレースフルシャットダウン
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
+    if (wss) {
+        wss.close(() => {
+            process.exit(0);
+        });
+    } else {
+        process.exit(0);
+    }
+});
+
+process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
+    if (wss) {
+        wss.close(() => {
+            process.exit(0);
+        });
+    } else {
+        process.exit(0);
+    }
 });
