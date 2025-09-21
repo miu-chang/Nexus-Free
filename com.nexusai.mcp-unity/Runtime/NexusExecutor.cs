@@ -170,67 +170,14 @@ namespace NexusAIConnect
                     case "GET_MONITORING_STATUS":
                         return GetMonitoringStatus();
                         
-                    // プロジェクト設定系
-                    case "GET_BUILD_SETTINGS":
-                        return NexusProjectSettings.GetBuildSettings();
-                        
-                    case "GET_PLAYER_SETTINGS":
-                        return NexusProjectSettings.GetPlayerSettings();
-                        
-                    case "GET_QUALITY_SETTINGS":
-                        return NexusProjectSettings.GetQualitySettings();
-                        
-                    case "GET_INPUT_SETTINGS":
-                        return NexusProjectSettings.GetInputSettings();
-                        
-                    case "GET_PHYSICS_SETTINGS":
-                        return NexusProjectSettings.GetPhysicsSettings();
-                        
-                    case "GET_PROJECT_SUMMARY":
-                        var projectSummary = NexusProjectSettings.GetProjectSettingsSummary();
-                        Debug.Log($"[NexusExecutor] GET_PROJECT_SUMMARY response length: {projectSummary.Length}");
-                        return projectSummary;
+                    // プロジェクト設定系（UI Editionでは無効）
                         
                     case "BATCH_CREATE":
                         return await BatchCreate(operation);
                         
-                    // === リアルタイム実行状態監視 ===
-                    case "GET_RUNTIME_STATUS":
-                        return NexusRuntimeMonitor.GetRuntimeStatus(operation.parameters);
+                    // === リアルタイム実行状態監視（UI Editionでは無効） ===
                         
-                    case "GET_PERFORMANCE_METRICS":
-                        return NexusRuntimeMonitor.GetPerformanceMetrics(operation.parameters);
-                        
-                    case "GET_MEMORY_USAGE":
-                        return NexusRuntimeMonitor.GetMemoryUsage(operation.parameters);
-                        
-                    case "GET_ERROR_STATUS":
-                        return NexusRuntimeMonitor.GetErrorStatus(operation.parameters);
-                        
-                    case "GET_BUILD_STATUS":
-                        return NexusRuntimeMonitor.GetBuildStatus(operation.parameters);
-                        
-                    // === 詳細なアセット情報取得 ===
-                    case "GET_TEXTURE_DETAILS":
-                        return NexusAssetAnalyzer.GetTextureDetails(operation.parameters);
-                        
-                    case "GET_MESH_DETAILS":
-                        return NexusAssetAnalyzer.GetMeshDetails(operation.parameters);
-                        
-                    case "GET_AUDIO_DETAILS":
-                        return NexusAssetAnalyzer.GetAudioDetails(operation.parameters);
-                        
-                    case "GET_ANIMATION_DETAILS":
-                        return NexusAssetAnalyzer.GetAnimationDetails(operation.parameters);
-                        
-                    case "GET_MATERIAL_DETAILS":
-                        return NexusAssetAnalyzer.GetMaterialDetails(operation.parameters);
-                        
-                    case "GET_ASSET_FILE_INFO":
-                        return NexusAssetAnalyzer.GetAssetFileInfo(operation.parameters);
-                        
-                    case "ANALYZE_ASSET_USAGE":
-                        return NexusAssetAnalyzer.AnalyzeAssetUsage(operation.parameters);
+                    // === 詳細なアセット情報取得（UI Editionでは無効） ===
                         
                     case "GET_ASSET_IMPORT_SETTINGS":
                         return GetAssetImportSettings(operation.parameters);
@@ -3101,7 +3048,7 @@ public class {className} : MonoBehaviour
             try
             {
                 bool enable = !parameters.ContainsKey("enable") || bool.Parse(parameters.GetValueOrDefault("enable", "true"));
-                bool success = NexusEventMonitor.Instance.StartPlayStateMonitoring(enable);
+                bool success = false; // NexusEventMonitor not available in UI Edition
                 
                 return success ? 
                     $"Play state monitoring {(enable ? "started" : "stopped")} successfully" :
@@ -3118,7 +3065,7 @@ public class {className} : MonoBehaviour
             try
             {
                 bool enable = !parameters.ContainsKey("enable") || bool.Parse(parameters.GetValueOrDefault("enable", "true"));
-                bool success = NexusEventMonitor.Instance.StartFileChangeMonitoring(enable);
+                bool success = false; // NexusEventMonitor not available in UI Edition
                 
                 return success ? 
                     $"File change monitoring {(enable ? "started" : "stopped")} successfully" :
@@ -3135,7 +3082,7 @@ public class {className} : MonoBehaviour
             try
             {
                 bool enable = !parameters.ContainsKey("enable") || bool.Parse(parameters.GetValueOrDefault("enable", "true"));
-                bool success = NexusEventMonitor.Instance.StartCompileMonitoring(enable);
+                bool success = false; // NexusEventMonitor not available in UI Edition
                 
                 return success ? 
                     $"Compile monitoring {(enable ? "started" : "stopped")} successfully" :
@@ -3157,7 +3104,7 @@ public class {className} : MonoBehaviour
                 string eventType = parameters["event_type"];
                 string subscriberId = parameters.GetValueOrDefault("subscriber_id", Guid.NewGuid().ToString());
                 
-                bool success = NexusEventMonitor.Instance.SubscribeToEvent(eventType, subscriberId);
+                bool success = false; // NexusEventMonitor not available in UI Edition
                 
                 return success ? 
                     $"Successfully subscribed to event '{eventType}' with ID '{subscriberId}'" :
@@ -3174,7 +3121,13 @@ public class {className} : MonoBehaviour
             try
             {
                 int count = int.Parse(parameters.GetValueOrDefault("count", "10"));
-                return NexusEventMonitor.Instance.GetRecentEvents(count);
+                // NexusEventMonitor not available in UI Edition
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    message = "Event monitoring is not available in UI Edition",
+                    events = new List<object>()
+                });
             }
             catch (Exception e)
             {
@@ -3186,7 +3139,13 @@ public class {className} : MonoBehaviour
         {
             try
             {
-                return NexusEventMonitor.Instance.GetMonitoringStatus();
+                // NexusEventMonitor not available in UI Edition
+                return JsonConvert.SerializeObject(new
+                {
+                    success = false,
+                    message = "Event monitoring is not available in UI Edition",
+                    status = new object()
+                });
             }
             catch (Exception e)
             {
