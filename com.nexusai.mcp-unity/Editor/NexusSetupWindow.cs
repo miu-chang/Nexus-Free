@@ -331,6 +331,33 @@ namespace NexusAIConnect
                 EditorGUILayout.EndVertical();
             }
             
+            // Pro版の宣伝
+            EditorGUILayout.Space(20);
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            GUILayout.Label("🚀 Upgrade to Nexus Pro", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+            
+            EditorGUILayout.LabelField("Get the complete Unity AI development suite:", EditorStyles.wordWrappedLabel);
+            EditorGUILayout.Space(5);
+            
+            EditorGUILayout.LabelField("✅ All 147+ tools - Complete Unity control");
+            EditorGUILayout.LabelField("✅ Regular bug fixes and updates");
+            EditorGUILayout.LabelField("✅ Advanced features - Animation, Audio, Physics");
+            EditorGUILayout.LabelField("✅ Priority support");
+            EditorGUILayout.LabelField("✅ Commercial license");
+            
+            EditorGUILayout.Space(10);
+            
+            var oldColor = GUI.backgroundColor;
+            GUI.backgroundColor = new Color(1f, 0.6f, 0.2f);
+            if (GUILayout.Button("🔥 Get Nexus Pro", GUILayout.Height(40)))
+            {
+                Application.OpenURL("https://assetstore.unity.com/packages/tools/nexus-pro");
+            }
+            GUI.backgroundColor = oldColor;
+            
+            EditorGUILayout.EndVertical();
+            
             EditorGUILayout.EndScrollView();
         }
         
